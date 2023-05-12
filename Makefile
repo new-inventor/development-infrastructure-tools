@@ -38,7 +38,7 @@ init:
 	git add .
 	git commit -m "start"
 	git remote add origin $(PROJECT_REPO)
-	git push origin master
+	git push --set-upstream origin master
 
 #--install: Install packages in root
 install:
