@@ -14,6 +14,7 @@ else
     UNAME := linux
 endif
 
+#--init: Initialize project. Create directories, prepare yarn, make package.json, push first commit to repo.
 init:
 	mkdir -p "$(APPS_PATH)"
 	mkdir -p "$(LIBRARIES_PATH)"
