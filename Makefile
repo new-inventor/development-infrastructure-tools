@@ -33,7 +33,7 @@ init:
 	sed -i "s/AUTHOR/$(subst /,\/,$(PROJECT_AUTHOR))/g"  ./package.json
 	sed -i "s/APPS_PATH/$(subst /,\/,$(APPS_DIR))/g"  ./package.json
 	sed -i "s/LIBS_PATH/$(subst /,\/,$(LIBRARIES_DIR))/g"  ./package.json
-	echo '# $(WORKSPACE_NAME)' >> README.md
+	echo '# $(WORKSPACE_NAME)' > README.md
 	yarn install
 	git add .
 	git commit -m "start"
