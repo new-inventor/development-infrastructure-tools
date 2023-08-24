@@ -1,0 +1,19 @@
+{
+  "name": "starter",
+  "packageManager": "yarn@3.6.3",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "cross-spawn": "^7.0.3",
+    "inquirer": "^9.2.10",
+    "yaml": "^2.3.1"
+  },
+  "bin": {
+    "itools-create-app": "bin/create-app.js",
+    "itools-docker": "bin/docker-decorator.js.js",
+    "itools-package": "bin/package-helper.js"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9"
+  }
+}

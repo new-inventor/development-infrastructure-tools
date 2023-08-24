@@ -1,15 +1,9 @@
 {
-  "name": "NAME",
   "version": "0.0.1",
-  "description": "DESCRIPTION",
   "main": "index.js",
-  "author": "AUTHOR",
+  "author": "",
   "license": "MIT",
   "private": true,
-  "workspaces": [
-    "APPS_PATH/*",
-    "LIBS_PATH/*"
-  ],
   "engines": {
     "node": "^16.17",
     "yarn": "^3.5"
@@ -29,6 +23,5 @@
     "postpack": "pinst --enable",
     "lint": "git add . && yarn workspaces run lint-staged",
     "test": "yarn workspaces run jest --watchAll=false --passWithNoTests"
-  },
-  "packageManager": "yarn@3.5.1"
+  }
 }
