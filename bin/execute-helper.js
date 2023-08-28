@@ -1,5 +1,5 @@
-import {execSync} from "node:child_process";
-import spawn from 'cross-spawn';
+const {execSync} = require("node:child_process");
+const spawn = require('cross-spawn');
 import chalk from 'chalk';
 
 

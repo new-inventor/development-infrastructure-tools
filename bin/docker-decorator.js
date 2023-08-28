@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import fs from 'fs';
-import path from 'path';
-import {Command} from "commander";
-import {execute} from './execute-helper';
-import {stringify} from 'yaml';
+const fs = require('fs');
+const path = require('path');
+const {Command} = require("commander");
+const {execute} = require('./execute-helper');
+const {stringify} = require('yaml');
 import chalk from 'chalk';
 
 const program = new Command();

@@ -1,6 +1,6 @@
-import path from "path";
-import fs from "fs";
-import {getCommandRes} from "./execute-helper";
+const path = require("path");
+const fs = require("fs");
+const {getCommandRes} = require("./execute-helper");
 
 const createPackageJson = (templatesDir, packageDir, isRoot, params) => {
   const packageJsonDefaultsFile = path.join(templatesDir, 'package.json');

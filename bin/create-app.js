@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-import fs from 'fs';
-import path from 'path';
-import {Command, Option} from "commander";
-import config from '../config.json';
-import {stringify} from 'yaml';
-import {execute} from './execute-helper';
-import {createPackageJson} from './package-json-generator';
+const {Command, Option} = require('commander');
+const fs = require('fs');
+const path = require('path');
+const config = require('../config.json');
+const {stringify} = require('yaml');
+const {execute} = require('./execute-helper');
+const {createPackageJson} = require('./package-json-generator');
 import chalk from 'chalk';
 
 
