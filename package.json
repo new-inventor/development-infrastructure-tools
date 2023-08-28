@@ -12,9 +12,9 @@
     "yaml": "^2.3.1"
   },
   "bin": {
-    "itools-create-app": "bin/create-app.cjs",
-    "itools-docker": "bin/docker-decorator.cjs",
-    "itools-package": "bin/package-helper.cjs"
+    "itools-create-app": "bin/create-app.js",
+    "itools-docker": "bin/docker-decorator.js",
+    "itools-package": "bin/package-helper.js"
   },
   "devDependencies": {
     "@types/inquirer": "^9"
