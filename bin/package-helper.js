@@ -5,6 +5,7 @@ const path = require('path');
 const {Command, Option, Argument} = require("commander");
 const {execute} = require('./execute-helper');
 const {createPackageJson} = require('./package-json-generator');
+const chalk = require('chalk');
 
 const program = new Command();
 const runDir = process.cwd();
@@ -51,7 +52,7 @@ program
         .find(dirent => dirent.isDirectory() && dirent.name === packageName)
       if (hasPackage) {
         fs.rmSync(path.join(rootDir, packageName), {recursive: true, force: true});
-        console.log('Done');
+        console.log(chalk.green('Done'));
         return;
       }
     }
@@ -64,8 +65,8 @@ program
   .argument('<action>', 'Action to do')
   .action((packageName, action) => {
     return execute('yarn', ['workspace', `@${projectConfig.projectName}/${packageName}`, action], true)
-      .then(() => console.log('Done'))
-      .catch((error) => console.error(error));
+      .then(() => console.log(chalk.green('Done')))
+      .catch((error) => console.error(chalk.red(error)));
   });
 program
   .command('add')
@@ -79,22 +80,22 @@ program
     try {
       if (options.dependencies.length > 0) {
         await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', ...options.dependencies], true);
-        console.log('Dependencies installed');
+        console.log(chalk.green('Dependencies installed'));
       }
       if (options.devDependencies.length > 0) {
         await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', '-D', ...options.devDependencies], true);
-        console.log('Dev dependencies installed');
+        console.log(chalk.green('Dev dependencies installed'));
       }
       if (options.peerDependencies.length > 0) {
         await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', '-P', ...options.peerDependencies], true);
-        console.log('Peer dependencies installed');
+        console.log(chalk.green('Peer dependencies installed'));
       }
       if (options.optionalDependencies.length > 0) {
         await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', '-O', ...options.optionalDependencies], true);
-        console.log('Optional dependencies installed');
+        console.log(chalk.green('Optional dependencies installed'));
       }
     } catch (error) {
-      console.error(error);
+      console.error(chalk.red(error));
     }
   });
 program
@@ -105,8 +106,8 @@ program
   .action((packageName, dependencies) => {
     if(dependencies.length > 0) {
       return execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'remove', ...dependencies], true)
-        .then(() => console.log('Done'))
-        .catch((error) => console.error(error));
+        .then(() => console.log(chalk.green('Done')))
+        .catch((error) => console.error(chalk.red(error)));
     }
   });
 

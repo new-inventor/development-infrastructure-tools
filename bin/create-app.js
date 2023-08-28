@@ -7,6 +7,7 @@ const config = require('../config.json');
 const {stringify} = require('yaml');
 const {execute} = require('./execute-helper');
 const {createPackageJson} = require('./package-json-generator');
+const chalk = require('chalk');
 
 
 const initYarn1 = async (projectDir) => {
@@ -126,8 +127,8 @@ program
   .parse();
 
 main(program.opts()).then(() => {
-  console.log('Done');
+  console.log(chalk.green('Done'));
 }).catch((error) => {
-  console.error(error);
+  console.error(chalk.red(error));
 });
 

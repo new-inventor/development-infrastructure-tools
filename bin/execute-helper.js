@@ -1,5 +1,6 @@
 const {execSync} = require("node:child_process");
 const spawn = require('cross-spawn');
+const chalk = require('chalk');
 
 
 const execute = (command, params, printCommand = false) => {
@@ -17,7 +18,7 @@ const execute = (command, params, printCommand = false) => {
       resolve(code);
     });
     runner.on('error', (error) => {
-      console.error(error);
+      console.error(chalk.red(error));
       reject(error);
     })
   });

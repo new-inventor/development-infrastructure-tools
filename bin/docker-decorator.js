@@ -5,6 +5,7 @@ const path = require('path');
 const {Command} = require("commander");
 const {execute} = require('./execute-helper');
 const {stringify} = require('yaml');
+const chalk = require('chalk');
 
 const program = new Command();
 const runDir = process.cwd();
@@ -24,8 +25,8 @@ program
   .argument('<configuration-name>', 'Docker compose configuration name')
   .action((configurationName) => {
     execute(`docker compose -f ${path.join(dockerComposeConfigurationsDir, `docker-compose.${configurationName}-${uName}.yaml`)} --env-file ${path.join(infrastructureEnvsDir, `.env.${configurationName}`)} -p ${projectConfig.projectName}-${configurationName} up --build -d`)
-      .then(() => console.log('Done'))
-      .catch((error) => console.error(error));
+      .then(() => console.log(chalk.green('Done')))
+      .catch((error) => console.error(chalk.red(error)));
   });
 program
   .command('stop')
@@ -33,8 +34,8 @@ program
   .argument('<configuration-name>', 'Docker compose configuration name')
   .action((configurationName) => {
     execute(`docker compose -f ${path.join(dockerComposeConfigurationsDir, `docker-compose.${configurationName}-${uName}.yaml`)} --env-file ${path.join(infrastructureEnvsDir, `.env.${configurationName}`)} -p ${projectConfig.projectName}-${configurationName} down`)
-      .then(() => console.log('Done'))
-      .catch((error) => console.error(error));
+      .then(() => console.log(chalk.green('Done')))
+      .catch((error) => console.error(chalk.red(error)));
   });
 program
   .command('run')
@@ -44,8 +45,8 @@ program
   .option('-c, --command <command>', 'Command to run inside the container')
   .action((configurationName, serviceName, options) => {
     execute(`docker compose -f ${path.join(dockerComposeConfigurationsDir, `docker-compose.${configurationName}-${uName}.yaml`)} --env-file ${path.join(infrastructureEnvsDir, `.env.${configurationName}`)} -p ${projectConfig.projectName}-${configurationName} run ${serviceName} ${options.command}`)
-      .then(() => console.log('Done'))
-      .catch((error) => console.error(error));
+      .then(() => console.log(chalk.green('Done')))
+      .catch((error) => console.error(chalk.red(error)));
   });
 program
   .command('create-conf')
@@ -64,7 +65,7 @@ program
     config.volumes = options.volumes.reduce((acc, item) => ({...acc, [item]: null}), {});
     fs.writeFileSync(path.join(dockerComposeConfigurationsDir, `docker-compose.${configurationName}-linux.yaml`), stringify(config));
     fs.writeFileSync(path.join(dockerComposeConfigurationsDir, `docker-compose.${configurationName}-windows.yaml`), stringify(config));
-    console.log('Done');
+    console.log(chalk.green('Done'));
   });
 
 program.parse();
