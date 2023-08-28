@@ -82,20 +82,20 @@ program
   .addOption(new Option('-o, --optional-dependencies <optional-dependencies...>', 'Package optional dependencies list').default([]))
   .action(async (packageName, options) => {
     try {
-      if (options.dependencies) {
+      if (options.dependencies.length > 0) {
         await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', ...options.dependencies], true);
         console.log('Dependencies installed');
       }
-      if (options.devDependencies) {
-        await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', ...options.devDependencies], true);
+      if (options.devDependencies.length > 0) {
+        await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', '-D', ...options.devDependencies], true);
         console.log('Dev dependencies installed');
       }
-      if (options.peerDependencies) {
-        await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', ...options.peerDependencies], true);
+      if (options.peerDependencies.length > 0) {
+        await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', '-P', ...options.peerDependencies], true);
         console.log('Peer dependencies installed');
       }
-      if (options.optionalDependencies) {
-        await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', ...options.optionalDependencies], true);
+      if (options.optionalDependencies.length > 0) {
+        await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', '-O', ...options.optionalDependencies], true);
         console.log('Optional dependencies installed');
       }
     } catch (error) {
@@ -108,9 +108,11 @@ program
   .argument('<package-name>', 'Package name to remove package from')
   .argument('<dependencies...>', 'Package dependencies to remove')
   .action((packageName, dependencies) => {
-    return execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'remove', ...dependencies], true)
-      .then(() => console.log('Done'))
-      .catch((error) => console.log(error));
+    if(dependencies.length > 0) {
+      return execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'remove', ...dependencies], true)
+        .then(() => console.log('Done'))
+        .catch((error) => console.log(error));
+    }
   });
 
 program.parse();

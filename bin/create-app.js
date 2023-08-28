@@ -123,7 +123,7 @@ program
   .option('-r, --repo <repo>', 'Project repository address')
   .addOption(new Option('--yarn-plugins <yarn-plugins...>', 'Yarn 3 plugins list').default(config.yarnPlugins).conflicts('yarn1'))
   .option('-f, --force', 'Force recreate')
-  .option('--yarn1', 'Initialize yarn 3 project')
+  .option('--yarn1', 'Initialize yarn 1 project')
   .parse();
 
 main(program.opts()).then(() => {
