@@ -21,16 +21,6 @@ program
   .description('Cli to help work with yarn workspaces packages')
   .version('0.0.1');
 program
-  .command('run')
-  .description('Start package in dev mode')
-  .argument('<package-name>', 'Package name to start')
-  .argument('<action>', 'Action to do')
-  .action((packageName, action) => {
-    execute('yarn', ['workspace', `@${projectConfig.projectName}/${packageName}`, action], true)
-      .then(() => console.log('Done'))
-      .catch((error) => console.log(error));
-  });
-program
   .command('create')
   .description('Create package in specified directory')
   .addArgument(new Argument('<root-dir>', 'Directory to create package in').choices(Object.keys(packagesDirs)))
@@ -54,16 +44,73 @@ program
       yarn1: projectConfig.isYarn1,
     });
   });
-// program
-//   .command('run')
-//   .description('Run command on docker-compose configuration container')
-//   .argument('<configuration-name>', 'Docker compose configuration name')
-//   .argument('<service-name>', 'Docker compose service name')
-//   .option('-c, --command <command>', 'Command to run inside the container')
-//   .action((configurationName, serviceName, options) => {
-//     execute(`docker compose -f ${path.join(dockerComposeConfigurationsDir, `docker-compose.${configurationName}-${uName}.yaml`)} --env-file ${path.join(infrastructureEnvsDir, `.env.${configurationName}`)} -p ${projectConfig.projectName}-${configurationName} run ${serviceName} ${options.command}`)
-//       .then(() => console.log('Done'))
-//       .catch((error) => console.log(error));
-//   });
+program
+  .command('delete')
+  .description('Delete package from project')
+  .argument('<package-name>', 'Package name to run action on')
+  .action(async (packageName) => {
+    const len = projectConfig.packageDirs.length || 0;
+    for (let i = 0; i < len; i++) {
+      const rootDir = path.join(runDir, projectConfig.packageDirs[i]);
+      const hasPackage = fs.readdirSync(rootDir, {withFileTypes: true})
+        .find(dirent => dirent.isDirectory() && dirent.name === packageName)
+      if (hasPackage) {
+        fs.rmSync(path.join(rootDir, packageName), {recursive: true, force: true});
+        console.log('Done');
+        return;
+      }
+    }
+    throw new Error(`Package "${packageName}" not found in packages directories: "${projectConfig.packageDirs.join('", "')}"`);
+  });
+program
+  .command('run')
+  .description('Start package in dev mode')
+  .argument('<package-name>', 'Package name to run action on')
+  .argument('<action>', 'Action to do')
+  .action((packageName, action) => {
+    return execute('yarn', ['workspace', `@${projectConfig.projectName}/${packageName}`, action], true)
+      .then(() => console.log('Done'))
+      .catch((error) => console.log(error));
+  });
+program
+  .command('add')
+  .description('Add dependency to package')
+  .argument('<package-name>', 'Package name to add package to')
+  .addOption(new Option('-d, --dependencies <dependencies...>', 'Package dependencies list').default([]))
+  .addOption(new Option('-e, --dev-dependencies <dev-dependencies...>', 'Package dev dependencies list').default([]))
+  .addOption(new Option('-p, --peer-dependencies <peer-dependencies...>', 'Package peer dependencies list').default([]))
+  .addOption(new Option('-o, --optional-dependencies <optional-dependencies...>', 'Package optional dependencies list').default([]))
+  .action(async (packageName, options) => {
+    try {
+      if (options.dependencies) {
+        await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', ...options.dependencies], true);
+        console.log('Dependencies installed');
+      }
+      if (options.devDependencies) {
+        await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', ...options.devDependencies], true);
+        console.log('Dev dependencies installed');
+      }
+      if (options.peerDependencies) {
+        await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', ...options.peerDependencies], true);
+        console.log('Peer dependencies installed');
+      }
+      if (options.optionalDependencies) {
+        await execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'add', ...options.optionalDependencies], true);
+        console.log('Optional dependencies installed');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
+program
+  .command('remove')
+  .description('Remove dependency from package')
+  .argument('<package-name>', 'Package name to remove package from')
+  .argument('<dependencies...>', 'Package dependencies to remove')
+  .action((packageName, dependencies) => {
+    return execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'remove', ...dependencies], true)
+      .then(() => console.log('Done'))
+      .catch((error) => console.log(error));
+  });
 
 program.parse();
