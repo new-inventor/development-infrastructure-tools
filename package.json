@@ -11,7 +11,7 @@
   },
   "bin": {
     "itools-create-app": "bin/create-app.js",
-    "itools-docker": "bin/docker-decorator.js.js",
+    "itools-docker": "bin/docker-decorator.js",
     "itools-package": "bin/package-helper.js"
   },
   "devDependencies": {
