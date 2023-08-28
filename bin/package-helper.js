@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
-const {Command, Option, Argument} = require("commander");
-const {execute} = require('./execute-helper');
-const {createPackageJson} = require('./package-json-generator');
+import fs from 'fs';
+import path from 'path';
+import {Command, Option, Argument} from "commander";
+import {execute} from './execute-helper';
+import {createPackageJson} from './package-json-generator';
 import chalk from 'chalk';
 
 const program = new Command();
