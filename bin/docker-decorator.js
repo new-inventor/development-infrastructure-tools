@@ -3,7 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import {Command} from "commander";
-import {execute} from './execute-helper';
+import {execute} from './execute-helper.js';
 import {stringify} from 'yaml';
 import chalk from 'chalk';
 

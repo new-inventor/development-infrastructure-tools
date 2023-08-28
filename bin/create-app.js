@@ -5,7 +5,7 @@ import path from 'path';
 import {Command, Option} from "commander";
 import config from '../config.json';
 import {stringify} from 'yaml';
-import {execute} from './execute-helper';
+import {execute} from './execute-helper.js';
 import {createPackageJson} from './package-json-generator';
 import chalk from 'chalk';
 
