@@ -128,6 +128,6 @@ program
 main(program.opts()).then(() => {
   console.log('Done');
 }).catch((error) => {
-  console.log(error);
+  console.error(error);
 });
 

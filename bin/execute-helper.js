@@ -9,7 +9,7 @@ const execute = (command, params, printCommand = false) => {
     runner.stdout.on('data', output => {
       // the output data is captured and printed in the callback
       if (printCommand) {
-        console.log("Output: ", output.toString())
+        process.stdout.write(`Output: ${output.toString()}`)
       }
     });
     runner.on('close', (code) => {
@@ -17,7 +17,7 @@ const execute = (command, params, printCommand = false) => {
       resolve(code);
     });
     runner.on('error', (error) => {
-      console.log(error);
+      console.error(error);
       reject(error);
     })
   });
@@ -31,7 +31,7 @@ const getCommandRes = (command, printCommand = false) => {
     const res = execSync(command);
     return res.toString();
   } catch (e) {
-    console.log('Error', e.output.toString());
+    console.error('Error', e.output.toString());
   }
 }
 

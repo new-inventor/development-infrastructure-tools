@@ -65,7 +65,7 @@ program
   .action((packageName, action) => {
     return execute('yarn', ['workspace', `@${projectConfig.projectName}/${packageName}`, action], true)
       .then(() => console.log('Done'))
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   });
 program
   .command('add')
@@ -94,7 +94,7 @@ program
         console.log('Optional dependencies installed');
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   });
 program
@@ -106,7 +106,7 @@ program
     if(dependencies.length > 0) {
       return execute(`yarn`, ['workspace', `@${projectConfig.projectName}/${packageName}`, 'remove', ...dependencies], true)
         .then(() => console.log('Done'))
-        .catch((error) => console.log(error));
+        .catch((error) => console.error(error));
     }
   });
 

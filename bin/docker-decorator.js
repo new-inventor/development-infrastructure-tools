@@ -25,7 +25,7 @@ program
   .action((configurationName) => {
     execute(`docker compose -f ${path.join(dockerComposeConfigurationsDir, `docker-compose.${configurationName}-${uName}.yaml`)} --env-file ${path.join(infrastructureEnvsDir, `.env.${configurationName}`)} -p ${projectConfig.projectName}-${configurationName} up --build -d`)
       .then(() => console.log('Done'))
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   });
 program
   .command('stop')
@@ -34,7 +34,7 @@ program
   .action((configurationName) => {
     execute(`docker compose -f ${path.join(dockerComposeConfigurationsDir, `docker-compose.${configurationName}-${uName}.yaml`)} --env-file ${path.join(infrastructureEnvsDir, `.env.${configurationName}`)} -p ${projectConfig.projectName}-${configurationName} down`)
       .then(() => console.log('Done'))
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   });
 program
   .command('run')
@@ -45,7 +45,7 @@ program
   .action((configurationName, serviceName, options) => {
     execute(`docker compose -f ${path.join(dockerComposeConfigurationsDir, `docker-compose.${configurationName}-${uName}.yaml`)} --env-file ${path.join(infrastructureEnvsDir, `.env.${configurationName}`)} -p ${projectConfig.projectName}-${configurationName} run ${serviceName} ${options.command}`)
       .then(() => console.log('Done'))
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   });
 program
   .command('create-conf')
