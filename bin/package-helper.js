@@ -39,6 +39,7 @@ program
       description: options.description,
       yarn1: projectConfig.isYarn1,
     });
+    console.log(chalk.green('Done'));
   });
 program
   .command('delete')
