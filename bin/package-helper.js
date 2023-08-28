@@ -3,18 +3,13 @@
 const fs = require('fs');
 const path = require('path');
 const {Command, Option, Argument} = require("commander");
-const config = require("../config.json");
-const {execute, getCommandRes} = require('./execute-helper');
+const {execute} = require('./execute-helper');
 const {createPackageJson} = require('./package-json-generator');
 
 const program = new Command();
 const runDir = process.cwd();
 const projectConfig = JSON.parse(fs.readFileSync(path.join(runDir, 'proj.json')).toString());
-const infrastructureDir = path.join(runDir, projectConfig.infrastructureDir);
-const dockerComposeConfigurationsDir = path.join(infrastructureDir, 'docker-compose');
-const infrastructureEnvsDir = path.join(infrastructureDir, 'env');
 const packagesDirs = projectConfig.packageDirs.reduce((acc, item) => ({...acc, [item]: path.join(runDir, item)}), {});
-const uName = process.env.PATH.includes(';') ? 'windows' : 'linux';
 
 program
   .name('package-helper')

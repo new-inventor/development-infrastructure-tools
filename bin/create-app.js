@@ -3,10 +3,9 @@
 const {Command, Option} = require('commander');
 const fs = require('fs');
 const path = require('path');
-const {execSync} = require('child_process');
 const config = require('../config.json');
 const {stringify} = require('yaml');
-const {execute, getCommandRes} = require('./execute-helper');
+const {execute} = require('./execute-helper');
 const {createPackageJson} = require('./package-json-generator');
 
 

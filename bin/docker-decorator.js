@@ -2,8 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const {Command, Option} = require("commander");
-const config = require("../config.json");
+const {Command} = require("commander");
 const {execute} = require('./execute-helper');
 const {stringify} = require('yaml');
 
@@ -13,10 +12,6 @@ const projectConfig = JSON.parse(fs.readFileSync(path.join(runDir, 'proj.json'))
 const infrastructureDir = path.join(runDir, projectConfig.infrastructureDir);
 const dockerComposeConfigurationsDir = path.join(infrastructureDir, 'docker-compose');
 const infrastructureEnvsDir = path.join(infrastructureDir, 'env');
-const packagesDirs = projectConfig.packageDirs.reduce((acc, item) => {
-  acc.set(item, path.join(runDir, item));
-  return acc;
-}, new Map());
 const uName = process.env.PATH.includes(';') ? 'windows' : 'linux';
 
 program
@@ -67,8 +62,8 @@ program
     config.services = options.services.reduce((acc, item) => ({...acc, [item]: {}}), {});
     config.networks = options.networks.reduce((acc, item) => ({...acc, [item]: null}), {});
     config.volumes = options.volumes.reduce((acc, item) => ({...acc, [item]: null}), {});
-    fs.writeFileSync(path.join(projectConfig.infrastructureDir, 'docker-compose', `docker-compose.${configurationName}-linux.yaml`), stringify(config));
-    fs.writeFileSync(path.join(projectConfig.infrastructureDir, 'docker-compose', `docker-compose.${configurationName}-windows.yaml`), stringify(config));
+    fs.writeFileSync(path.join(dockerComposeConfigurationsDir, `docker-compose.${configurationName}-linux.yaml`), stringify(config));
+    fs.writeFileSync(path.join(dockerComposeConfigurationsDir, `docker-compose.${configurationName}-windows.yaml`), stringify(config));
     console.log('Done');
   });
 
