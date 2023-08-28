@@ -3,8 +3,8 @@
 import fs from 'fs';
 import path from 'path';
 import {Command, Option, Argument} from "commander";
-import {execute} from './execute-helper.js';
-import {createPackageJson} from './package-json-generator.js';
+import {execute} from './execute-helper';
+import {createPackageJson} from './package-json-generator';
 import chalk from 'chalk';
 
 const program = new Command();
