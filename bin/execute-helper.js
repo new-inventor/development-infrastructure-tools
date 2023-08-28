@@ -1,6 +1,6 @@
 const {execSync} = require("node:child_process");
 const spawn = require('cross-spawn');
-const chalk = require('chalk');
+import chalk from 'chalk';
 
 
 const execute = (command, params, printCommand = false) => {

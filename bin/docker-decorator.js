@@ -5,7 +5,7 @@ const path = require('path');
 const {Command} = require("commander");
 const {execute} = require('./execute-helper');
 const {stringify} = require('yaml');
-const chalk = require('chalk');
+import chalk from 'chalk';
 
 const program = new Command();
 const runDir = process.cwd();
