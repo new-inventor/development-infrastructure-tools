@@ -7,7 +7,7 @@ const config = require('../config.json');
 const {stringify} = require('yaml');
 const {execute} = require('./execute-helper');
 const {createPackageJson} = require('./package-json-generator');
-import chalk from 'chalk';
+const chalk = require('chalk');
 
 
 const initYarn1 = async (projectDir) => {
@@ -31,7 +31,7 @@ const initYarn3 = async (yarnPlugins) => {
   await execute('yarn', ['set', 'version', 'stable']);
   const pluginsLength = yarnPlugins.length;
   if(!!pluginsLength) {
-    for(let i = 0; i < pluginsLength; i++) {
+    for(i = 0; i < pluginsLength; i++) {
       await execute('yarn', ['plugin', 'import', yarnPlugins[i]], true);
     }
   }

@@ -5,7 +5,7 @@ const path = require('path');
 const {Command, Option, Argument} = require("commander");
 const {execute} = require('./execute-helper');
 const {createPackageJson} = require('./package-json-generator');
-import chalk from 'chalk';
+const chalk = require('chalk');
 
 const program = new Command();
 const runDir = process.cwd();
