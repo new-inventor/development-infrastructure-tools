@@ -67,8 +67,8 @@ program
     config.services = options.services.reduce((acc, item) => ({...acc, [item]: {}}), {});
     config.networks = options.networks.reduce((acc, item) => ({...acc, [item]: null}), {});
     config.volumes = options.volumes.reduce((acc, item) => ({...acc, [item]: null}), {});
-    fs.writeFileSync(path.join(projectConfig.infrastructureDir, `docker-compose.${configurationName}-linux.yaml`), stringify(config));
-    fs.writeFileSync(path.join(projectConfig.infrastructureDir, `docker-compose.${configurationName}-windows.yaml`), stringify(config));
+    fs.writeFileSync(path.join(projectConfig.infrastructureDir, 'docker-compose', `docker-compose.${configurationName}-linux.yaml`), stringify(config));
+    fs.writeFileSync(path.join(projectConfig.infrastructureDir, 'docker-compose', `docker-compose.${configurationName}-windows.yaml`), stringify(config));
     console.log('Done');
   });
 
