@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs";
 import {getCommandRes} from "./execute-helper.js";
 
-export const createPackageJson = (templatesDir, packageDir, isRoot, params) => {
+const createPackageJson = (templatesDir, packageDir, isRoot, params) => {
   const packageJsonDefaultsFile = path.join(templatesDir, 'package.json');
   const packageConf = JSON.parse(fs.readFileSync(packageJsonDefaultsFile).toString());
   packageConf.name = params.name;
@@ -22,4 +22,8 @@ export const createPackageJson = (templatesDir, packageDir, isRoot, params) => {
     packageConf.engines.yarn = '^3.5';
   }
   fs.writeFileSync(path.join(packageDir, 'package.json'), JSON.stringify(packageConf, null, 2));
+}
+
+module.exports = {
+  createPackageJson,
 }

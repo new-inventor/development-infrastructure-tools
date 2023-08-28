@@ -3,7 +3,7 @@ import spawn from 'cross-spawn';
 import chalk from 'chalk';
 
 
-export const execute = (command, params, printCommand = false) => {
+const execute = (command, params, printCommand = false) => {
   console.log('run: ', `${command} ${params ? params.join(' ') : ''}`);
   return new Promise((resolve, reject) => {
     const runner = spawn(command, params);
@@ -24,7 +24,7 @@ export const execute = (command, params, printCommand = false) => {
   });
 }
 
-export const getCommandRes = (command, printCommand = false) => {
+const getCommandRes = (command, printCommand = false) => {
   try {
     if (printCommand) {
       console.log('run: ', command);
@@ -34,4 +34,9 @@ export const getCommandRes = (command, printCommand = false) => {
   } catch (e) {
     console.error('Error', e.output.toString());
   }
+}
+
+module.exports = {
+  execute,
+  getCommandRes,
 }
