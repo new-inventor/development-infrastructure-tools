@@ -1,0 +1,27 @@
+{
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": "^20.9",
+    "yarn": "^3.6"
+  },
+  "browserslist": [
+    "defaults",
+    "> .3%"
+  ],
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.1",
+    "pinst": "^3.0.0"
+  },
+  "scripts": {
+    "husky:install": "husky install",
+    "prepack": "pinst --disable",
+    "postpack": "pinst --enable",
+    "lint": "git add . && yarn workspaces run lint-staged",
+    "test": "yarn workspaces run jest --watchAll=false --passWithNoTests"
+  }
+}

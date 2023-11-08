@@ -1,0 +1,13 @@
+{
+  "name": "PACKAGE_NAME",
+  "version": "0.0.1",
+  "private": true,
+  "packageManager": "PACKAGE_MANAGER",
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.7.0",
+    "cross-env": "^7.0.3",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
+    "rimraf": ""
+  }
+}

@@ -124,3 +124,4 @@ web_modules/
 *.sln
 dist_static
 uploads
+openapi-generator

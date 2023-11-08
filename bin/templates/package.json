@@ -5,8 +5,8 @@
   "license": "MIT",
   "private": true,
   "engines": {
-    "node": "^16.17",
-    "yarn": "^3.5"
+    "node": "^20.9",
+    "yarn": "^3.6"
   },
   "browserslist": [
     "defaults",

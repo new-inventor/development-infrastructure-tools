@@ -4,18 +4,49 @@
   "packageManager": "yarn@3.6.3",
   "license": "MIT",
   "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.7.0",
     "chalk": "^4",
     "commander": "^11.0.0",
+    "cross-env": "^7.0.3",
     "cross-spawn": "^7.0.3",
+    "date-fns": "^2.30.0",
+    "dot-object": "^2.1.4",
+    "glob": "9.3.4",
     "inquirer": "^9.2.10",
+    "java2typescript": "^1.0.2",
+    "prettier": "^3.0.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2",
     "yaml": "^2.3.1"
   },
+  "files": [
+    "bin/config.json",
+    "templates/**/*"
+  ],
   "bin": {
+    "itools-api": "bin/generate-api.js",
     "itools-create-app": "bin/create-app.js",
     "itools-docker": "bin/docker-decorator.js",
     "itools-package": "bin/package-helper.js"
   },
+  "scripts": {
+    "itools-create-app": "node bin/create-app.js",
+    "itools-docker": "node bin/docker-decorator.js",
+    "itools-package": "node bin/package-helper.js",
+    "itools-api": "node bin/generate-api.js",
+    "clean-bin": "rm -rf ./bin",
+    "build": "yarn clean-bin && yarn build-bin && yarn copy-templates-bin",
+    "build-bin": "yarn clean-bin && tsc -p ./src/tsconfig.json",
+    "copy-templates-bin": "cp -r ./src/templates ./bin/templates && cp -r ./src/typescript-fetch-templates ./bin/typescript-fetch-templates && cp -r ./src/typescript-nestjs-templates ./bin/typescript-nestjs-templates",
+    "build-test-api": "tsc -p ./src/target_ts/tsconfig.json",
+    "format": "prettier --write --ignore-unknown ./src",
+    "api-generate-dev": "cross-env JAVA_OPTS=\"-Dlog.level=info\" openapi-generator-cli generate",
+    "api-generate": "cross-env TS_POST_PROCESS_FILE=\"node ./node_modules/prettier/bin/prettier.cjs --write\" JAVA_OPTS=\"-Dlog.level=info\" openapi-generator-cli generate",
+    "java2ts": "java2ts j2ts.config.json"
+  },
   "devDependencies": {
-    "@types/inquirer": "^9"
+    "@types/dot-object": "^2",
+    "@types/inquirer": "^9",
+    "@types/prettier": "^3"
   }
 }

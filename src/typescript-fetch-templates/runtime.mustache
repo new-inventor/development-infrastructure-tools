@@ -1,0 +1,597 @@
+/* tslint:disable */
+/* eslint-disable */
+{{>licenseInfo}}
+
+import { format } from 'date-fns';
+
+export const BASE_PATH = "{{{basePath}}}".replace(/\/+$/, "");
+
+export interface ConfigurationParameters {
+    basePath?: string; // override base path
+    fetchApi?: FetchAPI; // override for fetch implementation
+    middleware?: Middleware[]; // middleware to apply before/after fetch requests
+    queryParamsStringify?: (params: HTTPQuery) => string; // stringify function for query strings
+    username?: string; // parameter for basic security
+    password?: string; // parameter for basic security
+    apiKey?: string | ((name: string) => string); // parameter for apiKey security
+    accessToken?: string | Promise<string> | ((name?: string, scopes?: string[]) => string | Promise<string>); // parameter for oauth2 security
+    headers?: HTTPHeaders; //header params we want to use on every request
+    credentials?: RequestCredentials; //value for the credentials param we want to use on each request
+}
+
+export class Configuration {
+    constructor(private configuration: ConfigurationParameters = {}) {}
+
+    set config(configuration: Configuration) {
+        this.configuration = configuration;
+    }
+
+    get basePath(): string {
+        return this.configuration.basePath != null ? this.configuration.basePath : BASE_PATH;
+    }
+
+    get fetchApi(): FetchAPI | undefined {
+        return this.configuration.fetchApi;
+    }
+
+    get middleware(): Middleware[] {
+        return this.configuration.middleware || [];
+    }
+
+    get queryParamsStringify(): (params: HTTPQuery) => string {
+        return this.configuration.queryParamsStringify || querystring;
+    }
+
+    get username(): string | undefined {
+        return this.configuration.username;
+    }
+
+    get password(): string | undefined {
+        return this.configuration.password;
+    }
+
+    get apiKey(): ((name: string) => string) | undefined {
+        const apiKey = this.configuration.apiKey;
+        if (apiKey) {
+            return typeof apiKey === 'function' ? apiKey : () => apiKey;
+        }
+        return undefined;
+    }
+
+    get accessToken(): ((name?: string, scopes?: string[]) => string | Promise<string>) | undefined {
+        const accessToken = this.configuration.accessToken;
+        if (accessToken) {
+            return typeof accessToken === 'function' ? accessToken : async () => accessToken;
+        }
+        return undefined;
+    }
+
+    get headers(): HTTPHeaders | undefined {
+        return this.configuration.headers;
+    }
+
+    get credentials(): RequestCredentials | undefined {
+        return this.configuration.credentials;
+    }
+}
+
+export const DefaultConfig = new Configuration();
+
+export const QueryFormatType = {
+    DATE_TIME: 'date-time',
+    DATE: 'date',
+    PRIMITIVE: 'primitive',
+    ARRAY: 'array'
+} as const;
+export type QueryFormatType = typeof QueryFormatType[keyof typeof QueryFormatType];
+
+export const RequestFormatType = {
+    FILE: 'file',
+    ARRAY: 'array',
+    PRIMITIVE: 'primitive',
+    BLOB: 'blob',
+    BLOB_RUNTIME_CHECK: 'blobRuntimeCheck'
+} as const;
+export type RequestFormatType = typeof RequestFormatType[keyof typeof RequestFormatType];
+
+/**
+ * This is the base class for all generated API classes.
+ */
+export class BaseAPI {
+
+    private static readonly jsonRegex = new RegExp('^(:?application\/json|[^;/ \t]+\/[^;/ \t]+[+]json)[ \t]*(:?;.*)?$', 'i');
+    private middleware: Middleware[];
+
+    constructor(protected configuration = DefaultConfig) {
+        this.middleware = configuration.middleware;
+    }
+
+    protected static addDateTimeToQuery(key: string, value: Date | undefined, queryObj: object, dateFormat?: string): void {
+        if(value === undefined || !(value instanceof Date)) {
+            return;
+        }
+        queryObj[key] = value.toISOString();
+    }
+
+    protected static addDateToQuery(key: string, value: Date | undefined, queryObj: object, dateFormat?: string): void {
+        if(value === undefined || !(value instanceof Date)) {
+            return;
+        }
+        queryObj[key] = value.toISOString().substring(0, 10);
+    }
+
+    protected static addPrimitiveToQuery(key: string, value: unknown, queryObj: Record<string, unknown>): void {
+        if(value !== undefined) {
+            queryObj[key] = value;
+        }
+    }
+
+    protected static addArrayToQuery(key: string, value: unknown[], queryObj: Record<string, unknown>, format?: CollectionFormatEnum, uniqueItems: boolean = false): void {
+        if(!value) {
+            return;
+        }
+        if(!format) {
+            queryObj[key] = value;
+        } else if (!uniqueItems){
+            queryObj[key] = value.join(format);
+        } else if(!!format && !!uniqueItems) {
+            queryObj[key] = Array.from(new Set(value)).join(format);
+        }
+    }
+
+    protected static composeQuery(obj: Record<string, unknown>, queryMap: Record<string, {type: QueryFormatType, data?: unknown}>): Record<string, string> {
+        const res: Record<string, string> = {};
+        for(const key in queryMap) {
+            switch(queryMap[key].type) {
+                case QueryFormatType.PRIMITIVE: BaseAPI.addPrimitiveToQuery(key, obj[key], res);
+                break;
+                case QueryFormatType.DATE_TIME: BaseAPI.addDateTimeToQuery(key, obj[key] as Date | undefined, res);
+                break;
+                case QueryFormatType.DATE: BaseAPI.addDateToQuery(key, obj[key] as Date | undefined, res);
+                break;
+                case QueryFormatType.ARRAY: BaseAPI.addArrayToQuery(key, obj[key] as unknown[], res, queryMap[key].data.collectionFormat as CollectionFormatEnum, queryMap[key].data.uniqueItems as boolean);
+                break;
+            }
+        }
+        return res;
+    }
+
+    protected static addPrimitiveToRequest(key: string, value: unknown, requestObj: { append(param: string, value: string | Blob): void }) {
+        if(value === undefined) {
+            return;
+        }
+        requestObj.append(key, `${value}`);
+    }
+
+    protected static addBlobToRequest(key: string, value: unknown, requestObj: { append(param: string, value: string | Blob): void }, toJsonMethod?: (obj: any) => any) {
+        if(value === undefined) {
+            return;
+        }
+        let checkedValue = !toJsonMethod ? value : toJsonMethod(value)
+        if(!!toJsonMethod) {
+            requestObj.append(key, new Blob([JSON.stringify(checkedValue)], { type: "application/json" }));
+        }
+    }
+
+    protected static addArrayToRequest(key: string, value: unknown[], requestObj: { append(param: string, value: string | Blob): void }, format?: CollectionFormatEnum, uniqueItems: boolean = false): void {
+        if(!value) {
+            return;
+        }
+        if(!format) {
+            value.forEach((element) => {
+                requestObj.append(key, `${element}`);
+            })
+        } else if (!uniqueItems){
+            requestObj.append(key, value.join(format));
+        } else if(!!format && !!uniqueItems) {
+            requestObj.append(key, Array.from(new Set(value)).join(format));
+        }
+    }
+
+    protected static composeRequest(
+        obj: Record<string, unknown>,
+        formParams: { append(param: string, value: string | Blob): void },
+        fieldsMap: Record<string, {type: RequestFormatType, data?: unknown}>
+    ) {
+        for(const fieldName in fieldsMap) {
+            switch(fieldsMap[fieldName].type) {
+                case RequestFormatType.ARRAY:
+                    BaseAPI.addArrayToRequest(
+                        fieldName,
+                        obj[fieldsMap[fieldName].data.paramName] as unknown[],
+                        formParams,
+                        fieldsMap[fieldName].data.collectionFormat as CollectionFormatEnum,
+                        fieldsMap[fieldName].data.uniqueItems as boolean
+                    );
+                    break;
+                case RequestFormatType.PRIMITIVE:
+                    BaseAPI.addPrimitiveToRequest(fieldName, obj[fieldsMap[fieldName].data.paramName], formParams);
+                    break;
+                case RequestFormatType.BLOB_RUNTIME_CHECK:
+                    BaseAPI.addBlobToRequest(fieldName, obj[fieldsMap[fieldName].data.paramName], formParams, fieldsMap[fieldName].data.toJsonMethod);
+                    break;
+                case RequestFormatType.BLOB:
+                    BaseAPI.addBlobToRequest(fieldName, obj[fieldsMap[fieldName].data.paramName], formParams);
+                    break;
+            }
+            if (obj[fieldName] !== undefined) {
+                formParams.append(fieldName, `${obj[fieldName]}`);
+            }
+        }
+        return formParams;
+    }
+
+    protected static addToObjIfSet(key: string, value: unknown, obj: Record<string, unknown>) {
+        if(BaseAPI.isSet(value)) {
+            obj[key] = value;
+        }
+    }
+
+    protected static isSet(value: unknown): boolean {
+        return (value !== null && value !== undefined);
+    }
+
+    protected static assertAllSet(obj: Record<string, unknown>, keys: string[], operationName: string): true | never {
+        for(const key in keys){
+            if(BaseAPI.isSet(obj[key])) {
+                throw new RequiredError(
+                    key,
+                    `Required parameter requestParameters.${key} was null or undefined when calling ${operationName}.`
+                );
+            }
+        }
+        return true;
+    }
+
+    protected static assertSet(
+        value: unknown,
+        paramName: string,
+        operationName: string
+    ): undefined | never {
+        if (BaseAPI.isSet(value)) {
+            return;
+        }
+        throw new RequiredError(
+            paramName,
+            `Required parameter requestParameters.${paramName} was null or undefined when calling ${operationName}.`
+        );
+    }
+
+    withMiddleware<T extends BaseAPI>(this: T, ...middlewares: Middleware[]) {
+        const next = this.clone<T>();
+        next.middleware = next.middleware.concat(...middlewares);
+        return next;
+    }
+
+    withPreMiddleware<T extends BaseAPI>(this: T, ...preMiddlewares: Array<Middleware['pre']>) {
+        const middlewares = preMiddlewares.map((pre) => ({ pre }));
+        return this.withMiddleware<T>(...middlewares);
+    }
+
+    withPostMiddleware<T extends BaseAPI>(this: T, ...postMiddlewares: Array<Middleware['post']>) {
+        const middlewares = postMiddlewares.map((post) => ({ post }));
+        return this.withMiddleware<T>(...middlewares);
+    }
+
+    /**
+     * Check if the given MIME is a JSON MIME.
+     * JSON MIME examples:
+     *   application/json
+     *   application/json; charset=UTF8
+     *   APPLICATION/JSON
+     *   application/vnd.company+json
+     * @param mime - MIME (Multipurpose Internet Mail Extensions)
+     * @return True if the given MIME is JSON, false otherwise.
+     */
+    protected isJsonMime(mime: string | null | undefined): boolean {
+        if (!mime) {
+            return false;
+        }
+        return BaseAPI.jsonRegex.test(mime);
+    }
+
+    protected async request(context: RequestOpts, initOverrides?: RequestInit | InitOverrideFunction): Promise<Response> {
+        const { url, init } = await this.createFetchParams(context, initOverrides);
+        const response = await this.fetchApi(url, init);
+        if (response && (response.status >= 200 && response.status < 300)) {
+            return response;
+        }
+        throw new ResponseError(response, 'Response returned an error code');
+    }
+
+    private async createFetchParams(context: RequestOpts, initOverrides?: RequestInit | InitOverrideFunction) {
+        let url = this.configuration.basePath + context.path;
+        if (context.query !== undefined && Object.keys(context.query).length !== 0) {
+            // only add the querystring to the URL if there are query parameters.
+            // this is done to avoid urls ending with a "?" character which buggy webservers
+            // do not handle correctly sometimes.
+            url += '?' + this.configuration.queryParamsStringify(context.query);
+        }
+
+        const headers = Object.assign({}, this.configuration.headers, context.headers);
+        Object.keys(headers).forEach(key => headers[key] === undefined ? delete headers[key] : {});
+
+        const initOverrideFn =
+            typeof initOverrides === "function"
+                ? initOverrides
+                : async () => initOverrides;
+
+        const initParams = {
+            method: context.method,
+            headers,
+            body: context.body,
+            credentials: this.configuration.credentials,
+        };
+
+        const overriddenInit: RequestInit = {
+            ...initParams,
+            ...(await initOverrideFn({
+                init: initParams,
+                context,
+            }))
+        };
+
+        const init: RequestInit = {
+            ...overriddenInit,
+            body:
+                isFormData(overriddenInit.body) ||
+                overriddenInit.body instanceof URLSearchParams ||
+                isBlob(overriddenInit.body)
+                    ? overriddenInit.body
+                    : JSON.stringify(overriddenInit.body),
+        };
+
+        return { url, init };
+    }
+
+    private fetchApi = async (url: string, init: RequestInit) => {
+        let fetchParams = { url, init };
+        for (const middleware of this.middleware) {
+            if (middleware.pre) {
+                fetchParams = await middleware.pre({
+                    fetch: this.fetchApi,
+                    ...fetchParams,
+                }) || fetchParams;
+            }
+        }
+        let response: Response | undefined = undefined;
+        try {
+            response = await (this.configuration.fetchApi || fetch)(fetchParams.url, fetchParams.init);
+        } catch (e) {
+            for (const middleware of this.middleware) {
+                if (middleware.onError) {
+                    response = await middleware.onError({
+                        fetch: this.fetchApi,
+                        url: fetchParams.url,
+                        init: fetchParams.init,
+                        error: e,
+                        response: response ? response.clone() : undefined,
+                    }) || response;
+                }
+            }
+            if (response === undefined) {
+              if (e instanceof Error) {
+                throw new FetchError(e, 'The request failed and the interceptors did not return an alternative response');
+              } else {
+                throw e;
+              }
+            }
+        }
+        for (const middleware of this.middleware) {
+            if (middleware.post) {
+                response = await middleware.post({
+                    fetch: this.fetchApi,
+                    url: fetchParams.url,
+                    init: fetchParams.init,
+                    response: response.clone(),
+                }) || response;
+            }
+        }
+        return response;
+    }
+
+    /**
+     * Create a shallow clone of `this` by constructing a new instance
+     * and then shallow cloning data members.
+     */
+    private clone<T extends BaseAPI>(this: T): T {
+        const constructor = this.constructor as any;
+        const next = new constructor(this.configuration);
+        next.middleware = this.middleware.slice();
+        return next;
+    }
+};
+
+function isBlob(value: any): value is Blob {
+    return typeof Blob !== 'undefined' && value instanceof Blob;
+}
+
+function isFormData(value: any): value is FormData {
+    return typeof FormData !== "undefined" && value instanceof FormData;
+}
+
+export class ResponseError extends Error {
+    override name: "ResponseError" = "ResponseError";
+    constructor(public response: Response, msg?: string) {
+        super(msg);
+    }
+}
+
+export class FetchError extends Error {
+    override name: "FetchError" = "FetchError";
+    constructor(public cause: Error, msg?: string) {
+        super(msg);
+    }
+}
+
+export class RequiredError extends Error {
+    override name: "RequiredError" = "RequiredError";
+    constructor(public field: string, msg?: string) {
+        super(msg);
+    }
+}
+
+export const CollectionFormatEnum = {
+    csv: ",",
+    ssv: " ",
+    tsv: "\t",
+    pipes: "|",
+};
+export type CollectionFormatEnum = typeof CollectionFormatEnum[keyof typeof CollectionFormatEnum];
+
+export type FetchAPI = WindowOrWorkerGlobalScope['fetch'];
+
+export type Json = any;
+export const HTTPMethod = {
+    GET: "GET",
+    POST: "POST",
+    PUT: "PUT",
+    PATCH: "PATCH",
+    DELETE: "DELETE",
+    OPTIONS: "OPTIONS",
+    HEAD: "HEAD",
+} as const;
+export type HTTPMethod = (typeof HTTPMethod)[keyof typeof HTTPMethod];
+export type HTTPHeaders = { [key: string]: string };
+export type HTTPQuery = { [key: string]: string | number | null | boolean | Array<string | number | null | boolean> | Set<string | number | null | boolean> | HTTPQuery };
+export type HTTPBody = Json | FormData | URLSearchParams;
+export type HTTPRequestInit = { headers?: HTTPHeaders; method: HTTPMethod; credentials?: RequestCredentials; body?: HTTPBody };
+export type ModelPropertyNaming = 'camelCase' | 'snake_case' | 'PascalCase' | 'original';
+
+export type InitOverrideFunction = (requestContext: { init: HTTPRequestInit, context: RequestOpts }) => Promise<RequestInit>
+
+export interface FetchParams {
+    url: string;
+    init: RequestInit;
+}
+
+export interface RequestOpts {
+    path: string;
+    method: HTTPMethod;
+    headers: HTTPHeaders;
+    query?: HTTPQuery;
+    body?: HTTPBody;
+}
+
+{{^withoutRuntimeChecks}}
+export function exists(json: any, key: string) {
+    const value = json[key];
+    return value !== null && value !== undefined;
+}
+{{/withoutRuntimeChecks}}
+
+export function querystring(params: HTTPQuery, prefix: string = ''): string {
+    return Object.keys(params)
+        .map(key => querystringSingleKey(key, params[key], prefix))
+        .filter(part => part.length > 0)
+        .join('&');
+}
+
+function querystringSingleKey(key: string, value: string | number | null | undefined | boolean | Array<string | number | null | boolean> | Set<string | number | null | boolean> | HTTPQuery, keyPrefix: string = ''): string {
+    const fullKey = keyPrefix + (keyPrefix.length ? `[${key}]` : key);
+    if (value instanceof Array) {
+        const multiValue = value.map(singleValue => encodeURIComponent(String(singleValue)))
+            .join(`&${encodeURIComponent(fullKey)}=`);
+        return `${encodeURIComponent(fullKey)}=${multiValue}`;
+    }
+    if (value instanceof Set) {
+        const valueAsArray = Array.from(value);
+        return querystringSingleKey(key, valueAsArray, keyPrefix);
+    }
+    if (value instanceof Date) {
+        return `${encodeURIComponent(fullKey)}=${encodeURIComponent(value.toISOString())}`;
+    }
+    if (value instanceof Object) {
+        return querystring(value as HTTPQuery, fullKey);
+    }
+    return `${encodeURIComponent(fullKey)}=${encodeURIComponent(String(value))}`;
+}
+
+{{^withoutRuntimeChecks}}
+export function mapValues(data: any, fn: (item: any) => any) {
+  return Object.keys(data).reduce(
+    (acc, key) => ({ ...acc, [key]: fn(data[key]) }),
+    {}
+  );
+}
+{{/withoutRuntimeChecks}}
+
+export function canConsumeForm(consumes: string[]): boolean {
+    return consume.includes('multipart/form-data');
+}
+
+export const replacePlaceholdersInUrl = (url: string, placeholders: Record<string, unknown>): string => {
+    let res = url;
+    for(let placeholderName in placeholders) {
+        res.replace(`{${placeholderName}}`, encodeURIComponent(`${placeholders[placeholderName]}`));
+    }
+    return res;
+}
+
+export interface RequestContext {
+    fetch: FetchAPI;
+    url: string;
+    init: RequestInit;
+}
+
+export interface ResponseContext {
+    fetch: FetchAPI;
+    url: string;
+    init: RequestInit;
+    response: Response;
+}
+
+export interface ErrorContext {
+    fetch: FetchAPI;
+    url: string;
+    init: RequestInit;
+    error: unknown;
+    response?: Response;
+}
+
+export interface Middleware {
+    pre?(context: RequestContext): Promise<FetchParams | void>;
+    post?(context: ResponseContext): Promise<Response | void>;
+    onError?(context: ErrorContext): Promise<Response | void>;
+}
+
+export interface ApiResponse<T> {
+    raw: Response;
+    value(): Promise<T>;
+}
+
+export interface ResponseTransformer<T> {
+    (json: any): T;
+}
+
+export class JSONApiResponse<T> {
+    constructor(public raw: Response, private transformer: ResponseTransformer<T> = (jsonValue: any) => jsonValue) {}
+
+    async value(): Promise<T> {
+        return this.transformer(await this.raw.json());
+    }
+}
+
+export class VoidApiResponse {
+    constructor(public raw: Response) {}
+
+    async value(): Promise<void> {
+        return undefined;
+    }
+}
+
+export class BlobApiResponse {
+    constructor(public raw: Response) {}
+
+    async value(): Promise<Blob> {
+        return await this.raw.blob();
+    };
+}
+
+export class TextApiResponse {
+    constructor(public raw: Response) {}
+
+    async value(): Promise<string> {
+        return await this.raw.text();
+    };
+}

@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "sourceMap": true,
+    "module": "esnext",
+    "target": "esnext",
+    "strict": true,
+    "lib": [
+      "dom",
+      "es2021"
+    ],
+    "types": [
+      "node"
+    ],
+    "removeComments": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "jsx": "react",
+    "allowJs": true,
+    "baseUrl": ".",
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noUnusedParameters": true,
+    "importHelpers": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true
+  },
+  "exclude": ["src/front"]
+}
