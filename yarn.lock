@@ -591,6 +591,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"development-infrastructure-tools@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "development-infrastructure-tools@workspace:."
+  dependencies:
+    "@openapitools/openapi-generator-cli": ^2.7.0
+    "@types/dot-object": ^2
+    "@types/inquirer": ^9
+    "@types/prettier": ^3
+    chalk: ^4
+    commander: ^11.0.0
+    cross-env: ^7.0.3
+    cross-spawn: ^7.0.3
+    date-fns: ^2.30.0
+    dot-object: ^2.1.4
+    glob: 9.3.4
+    inquirer: ^9.2.10
+    java2typescript: ^1.0.2
+    prettier: ^3.0.3
+    ts-node: ^10.9.1
+    typescript: ^5.2.2
+    yaml: ^2.3.1
+  bin:
+    itools-api: bin/generate-api.js
+    itools-create-app: bin/create-app.js
+    itools-docker: bin/docker-decorator.js
+    itools-package: bin/package-helper.js
+  languageName: unknown
+  linkType: soft
+
 "diff@npm:^4.0.1":
   version: 4.0.2
   resolution: "diff@npm:4.0.2"
@@ -1299,35 +1328,6 @@ __metadata:
   checksum: e35c5d28177b4d461d33c88cc11f6f3a5079e2b132c11e1746453bbb7a0c0b8a634f07541a2a234fa4758239d88203b758def509161b651e81958894c0b4b64b
   languageName: node
   linkType: hard
-
-"starter@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "starter@workspace:."
-  dependencies:
-    "@openapitools/openapi-generator-cli": ^2.7.0
-    "@types/dot-object": ^2
-    "@types/inquirer": ^9
-    "@types/prettier": ^3
-    chalk: ^4
-    commander: ^11.0.0
-    cross-env: ^7.0.3
-    cross-spawn: ^7.0.3
-    date-fns: ^2.30.0
-    dot-object: ^2.1.4
-    glob: 9.3.4
-    inquirer: ^9.2.10
-    java2typescript: ^1.0.2
-    prettier: ^3.0.3
-    ts-node: ^10.9.1
-    typescript: ^5.2.2
-    yaml: ^2.3.1
-  bin:
-    itools-api: bin/generate-api.js
-    itools-create-app: bin/create-app.js
-    itools-docker: bin/docker-decorator.js
-    itools-package: bin/package-helper.js
-  languageName: unknown
-  linkType: soft
 
 "string-width@npm:^4.1.0, string-width@npm:^4.2.0, string-width@npm:^4.2.3":
   version: 4.2.3
