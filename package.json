@@ -1,7 +1,7 @@
 {
   "name": "development-infrastructure-tools",
   "version": "0.0.1",
-  "packageManager": "yarn@3.6.3",
+  "packageManager": "yarn@3.6.4",
   "license": "MIT",
   "dependencies": {
     "@openapitools/openapi-generator-cli": "^2.7.0",
