@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
+    "outDir": "./bin",
     "rootDir": "./src",
     "sourceMap": true,
-    "module": "esnext",
+    "module": "CommonJS",
     "target": "esnext",
     "strict": true,
     "lib": [
-      "dom",
       "es2021"
     ],
     "types": [
@@ -16,7 +15,6 @@
     "removeComments": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "jsx": "react",
     "allowJs": true,
     "baseUrl": ".",
     "allowUnreachableCode": false,

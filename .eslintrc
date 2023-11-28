@@ -1,0 +1,144 @@
+{
+  "root": true,
+  "env": {
+    "jest": true,
+    "node": true
+  },
+  "extends": [
+    "airbnb",
+    "airbnb/hooks",
+    "airbnb-typescript",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "project": "tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint", "prettier"],
+  "rules": {
+    "class-methods-use-this": "warn",
+    "jsx-a11y/label-has-associated-control": 1,
+    "@typescript-eslint/lines-between-class-members": 0,
+    "@typescript-eslint/no-inferrable-types": 0,
+    "@typescript-eslint/comma-dangle": [
+      2,
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "never",
+        "enums": "always-multiline",
+        "generics": "never",
+        "tuples": "never"
+      }
+    ],
+    "@typescript-eslint/indent": 0,
+    "@typescript-eslint/no-non-null-assertion": 0,
+    "import/no-extraneous-dependencies": [
+      2,
+      {
+        "devDependencies": [
+          "**/*.test.js",
+          "**/*.test.jsx",
+          "**/*.spec.js",
+          "**/*.spec.jsx",
+          "**/*.test.ts",
+          "**/*.test.tsx",
+          "**/*.spec.ts",
+          "**/*.spec.tsx",
+          "**/setupTests.ts"
+        ]
+      }
+    ],
+    "padded-blocks": [2, "never"],
+    "no-plusplus": 0,
+    "indent": 0,
+    "object-property-newline": 0,
+    "comma-dangle": [
+      2,
+      {
+        "arrays": "always-multiline",
+        "objects": "always-multiline",
+        "imports": "always-multiline",
+        "exports": "always-multiline",
+        "functions": "never"
+      }
+    ],
+    "brace-style": [2, "1tbs"],
+    "key-spacing": [
+      2,
+      {
+        "mode": "strict",
+        "beforeColon": false,
+        "afterColon": true
+      }
+    ],
+    "comma-spacing": [
+      2,
+      {
+        "before": false,
+        "after": true
+      }
+    ],
+    "implicit-arrow-linebreak": 0,
+    "import/extensions": [
+      2,
+      "ignorePackages",
+      {
+        "js": "never",
+        "json": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "import/prefer-default-export": 0,
+    "linebreak-style": 0,
+    "max-len": [
+      2,
+      {
+        "code": 220,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true,
+        "ignoreUrls": true
+      }
+    ],
+    "quotes": [2, "single", { "avoidEscape": true }],
+    "no-console": 0,
+    "no-debugger": 2,
+    "no-multiple-empty-lines": [
+      2,
+      {
+        "max": 1,
+        "maxBOF": 0,
+        "maxEOF": 0
+      }
+    ],
+    "@typescript-eslint/no-unsafe-member-access": 1,
+    "@typescript-eslint/no-unsafe-call": 1,
+    "@typescript-eslint/no-unsafe-return": 1,
+    "@typescript-eslint/no-unsafe-argument": 1,
+    "@typescript-eslint/restrict-template-expressions": 1,
+    "no-bitwise": [2, { "allow": [">>=", "&"] }],
+    "sort-keys": 0,
+    "object-curly-newline": 0,
+    "lines-between-class-members": "off",
+    "no-nested-ternary": 1
+  },
+  "settings": {
+    "import/extensions": [".ts", ".json"],
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".json"]
+    },
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".ts"]
+      }
+    }
+  }
+}
