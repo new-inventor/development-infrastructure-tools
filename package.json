@@ -22,11 +22,7 @@
     "yaml": "^2.3.1"
   },
   "files": [
-    "bin/config.json",
-    "bin/tsconfig.json",
-    "bin/typescript-fetch-templates/**/*",
-    "bin/typescript-nestjs-templates/**/*",
-    "bin/templates/**/*"
+    "bin/**/*"
   ],
   "bin": {
     "itools-api": "bin/generate-api.js",
