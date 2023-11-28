@@ -27,9 +27,7 @@
     "importHelpers": true,
     "declaration": true,
     "esModuleInterop": true,
-    "suppressImplicitAnyIndexErrors": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true
-  },
-  "exclude": ["src/front"]
+  }
 }

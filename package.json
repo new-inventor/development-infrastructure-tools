@@ -12,6 +12,8 @@
     "date-fns": "^2.30.0",
     "dot-object": "^2.1.4",
     "glob": "9.3.4",
+    "gulp": "^4.0.2",
+    "gulp-typescript": "^6.0.0-alpha.1",
     "inquirer": "^9.2.10",
     "java2typescript": "^1.0.2",
     "prettier": "^3.0.3",
@@ -21,7 +23,10 @@
   },
   "files": [
     "bin/config.json",
-    "templates/**/*"
+    "bin/tsconfig.json",
+    "bin/typescript-fetch-templates/**/*",
+    "bin/typescript-nestjs-templates/**/*",
+    "bin/templates/**/*"
   ],
   "bin": {
     "itools-api": "bin/generate-api.js",
@@ -34,10 +39,8 @@
     "itools-docker": "node bin/docker-decorator.js",
     "itools-package": "node bin/package-helper.js",
     "itools-api": "node bin/generate-api.js",
-    "clean-bin": "rm -rf ./bin",
-    "build": "yarn clean-bin && yarn build-bin && yarn copy-templates-bin",
-    "build-bin": "yarn clean-bin && tsc -p ./src/tsconfig.json",
-    "copy-templates-bin": "cp -r ./src/templates ./bin/templates && cp -r ./src/typescript-fetch-templates ./bin/typescript-fetch-templates && cp -r ./src/typescript-nestjs-templates ./bin/typescript-nestjs-templates",
+    "clean": "gulp clean",
+    "build": "gulp build",
     "build-test-api": "tsc -p ./src/target_ts/tsconfig.json",
     "format": "prettier --write --ignore-unknown ./src",
     "api-generate-dev": "cross-env JAVA_OPTS=\"-Dlog.level=info\" openapi-generator-cli generate",
@@ -46,6 +49,7 @@
   },
   "devDependencies": {
     "@types/dot-object": "^2",
+    "@types/gulp": "^4",
     "@types/inquirer": "^9",
     "@types/prettier": "^3"
   }
