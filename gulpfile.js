@@ -11,7 +11,7 @@ function clean(cb) {
 }
 
 function build(cb) {
-  const tsResult = src("src/**/*.ts")
+  const tsResult = src("/**src/*.ts")
     .pipe(tsProject());
 
   return tsResult.js.pipe(dest('bin'));
@@ -19,8 +19,8 @@ function build(cb) {
 
 function copy(cb) {
   src("src/*.js").pipe(dest('bin'));
-  src("src/config.json").pipe(dest('bin/config.json'));
-  src("src/tsconfig.json").pipe(dest('bin/tsconfig.json'));
+  src("src/config.json").pipe(dest('bin'));
+  src("src/tsconfig.json").pipe(dest('bin'));
   src("src/templates/**/*").pipe(dest('bin/templates'));
   src("src/typescript-fetch-templates/**/*").pipe(dest('bin/typescript-fetch-templates'));
   src("src/typescript-nestjs-templates/**/*").pipe(dest('bin/typescript-nestjs-templates'));
