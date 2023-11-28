@@ -1,0 +1,14 @@
+{
+  "defaultProjectName": "new-project",
+  "packagesDirs": ["apps", "libs"],
+  "infrastructureDir": "infrastructure",
+  "node": "^16.17",
+  "yarn": "^3.5",
+  "yarnPlugins": [
+    "interactive-tools",
+    "typescript",
+    "workspace-tools",
+    "version",
+    "https://raw.githubusercontent.com/tophat/yarn-plugin-licenses/master/bundles/@yarnpkg/plugin-licenses-audit.js"
+  ]
+}
