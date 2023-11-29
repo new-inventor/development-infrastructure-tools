@@ -22,11 +22,11 @@ const esLintConfig = {
     jest: true,
     node: true,
   },
-  extends: ['airbnb', "airbnb/hooks", 'prettier'],
+  extends: ['airbnb', 'airbnb/hooks', 'prettier'],
   plugins: ['prettier'],
   rules: {
     'class-methods-use-this': 'warn',
-      "jsx-a11y/label-has-associated-control": 1,
+    'jsx-a11y/label-has-associated-control': 1,
     'import/no-extraneous-dependencies': [
       2,
       {
@@ -187,6 +187,144 @@ const eslintTsConfig = {
   },
 };
 
+const eslintReactConfig = {
+  plugins: ['react'],
+  rules: {
+    'react-hooks/exhaustive-deps': 1,
+    'react-hooks/rules-of-hooks': 1,
+    'react/jsx-props-no-spreading': 0,
+    'react/jsx-filename-extension': [
+      1,
+      {
+        extensions: ['.tsx', '.jsx'],
+      },
+    ],
+    'react/prop-types': 0,
+    'react/no-array-index-key': 2,
+    'react/react-in-jsx-scope': 2,
+    'react/self-closing-comp': [
+      2,
+      {
+        component: true,
+        html: true,
+      },
+    ],
+    'react/style-prop-object': [1],
+    'react/jsx-boolean-value': [1, 'never'],
+    'react/jsx-closing-bracket-location': 0,
+    'react/jsx-curly-spacing': [
+      2,
+      'never',
+      {
+        allowMultiline: true,
+      },
+    ],
+    'react/jsx-first-prop-new-line': [2, 'multiline-multiprop'],
+    'react/jsx-fragments': [2, 'syntax'],
+    'react/jsx-handler-names': 0,
+    'react/jsx-indent': [
+      1,
+      1,
+      {
+        checkAttributes: false,
+        indentLogicalExpressions: true,
+      },
+    ],
+    'react/jsx-key': [
+      2,
+      {
+        checkFragmentShorthand: true,
+      },
+    ],
+    'react/jsx-max-depth': [1, { max: 8 }],
+    'react/jsx-max-props-per-line': [
+      1,
+      {
+        maximum: 1,
+        when: 'multiline',
+      },
+    ],
+    'react/jsx-no-bind': [
+      1,
+      {
+        ignoreDOMComponents: false,
+        ignoreRefs: false,
+        allowArrowFunctions: true,
+        allowFunctions: false,
+        allowBind: false,
+      },
+    ],
+    'react/jsx-no-duplicate-props': [2, { ignoreCase: true }],
+    'react/jsx-no-literals': 0,
+    'react/jsx-no-script-url': 2,
+    'react/jsx-no-target-blank': [
+      1,
+      {
+        allowReferrer: false,
+        enforceDynamicLinks: 'always',
+      },
+    ],
+    'react/jsx-no-useless-fragment': 2,
+    'react/jsx-one-expression-per-line': 0,
+    'react/jsx-pascal-case': [2, { allowAllCaps: false }],
+    'react/jsx-props-no-multi-spaces': 2,
+    'react/jsx-sort-props': [
+      1,
+      {
+        callbacksLast: true,
+        shorthandFirst: false,
+        shorthandLast: true,
+        ignoreCase: true,
+        noSortAlphabetically: true,
+        reservedFirst: true,
+      },
+    ],
+    'react/jsx-tag-spacing': [
+      2,
+      {
+        closingSlash: 'never',
+        beforeSelfClosing: 'always',
+        afterOpening: 'never',
+        beforeClosing: 'never',
+      },
+    ],
+    'react/jsx-uses-vars': 1,
+    'react/jsx-wrap-multilines': [
+      2,
+      {
+        declaration: 'parens',
+        assignment: 'parens',
+        return: 'parens',
+        arrow: 'parens-new-line',
+        condition: 'parens-new-line',
+        logical: 'parens-new-line',
+        prop: 'ignore',
+      },
+    ],
+    'react/function-component-definition': [
+      1,
+      {
+        namedComponents: 'arrow-function',
+        unnamedComponents: ['arrow-function', 'function-expression'],
+      },
+    ],
+    'react/require-default-props': 0,
+  },
+  settings: {
+    'import/extensions': ['.tsx', '.jsx'],
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.tsx', '.jsx'],
+    },
+    'import/resolver': {
+      node: {
+        extensions: ['.jsx', '.tsx'],
+      },
+    },
+  },
+};
+
+const addItemsUnique = (...arrays) => Array.from(new Set([...arrays.flat()]));
+
 program
   .command('create')
   .description('Create package in specified directory')
@@ -242,9 +380,9 @@ program
         'eslint-config-prettier',
         'eslint-plugin-import',
         'eslint-plugin-prettier',
-          'eslint-plugin-jsx-a11y',
-          'eslint-plugin-react',
-          'eslint-plugin-react-hooks',
+        'eslint-plugin-jsx-a11y',
+        'eslint-plugin-react',
+        'eslint-plugin-react-hooks',
       ],
       true
     );
@@ -353,8 +491,299 @@ program
   .description('Add react to package')
   .addArgument(new Argument('<root-dir>', 'Directory to create package in').choices(Object.keys(packagesDirs)))
   .argument('<package-name>', 'Package name')
-  .action((packageName, dependencies) => {
-    console.log('Not implemented');
+  .action(async (packageRootDir, packageName) => {
+    await execute(
+      `yarn`,
+      [
+        'workspace',
+        `@${projectConfig.projectName}/${packageName}`,
+        'add',
+        'react',
+        'react-dom',
+        'core-js',
+        'regenerator-runtime',
+      ],
+      true
+    );
+    await execute(
+      `yarn`,
+      [
+        'workspace',
+        `@${projectConfig.projectName}/${packageName}`,
+        'add',
+        '-D',
+        '@babel/cli',
+        '@babel/core',
+        '@babel/preset-env',
+        '@babel/preset-react',
+        '@babel/preset-typescript',
+        '@types/babel__core',
+        '@types/react',
+        '@types/react-dom',
+        'autoprefixer',
+        'babel-loader',
+        'clean-webpack-plugin',
+        'eslint-plugin-jsx-a11y',
+        'eslint-plugin-react',
+        'eslint-plugin-react-hooks',
+        'html-webpack-plugin',
+        'postcss',
+        'postcss-loader',
+        'postcss-preset-env',
+        'terser-webpack-plugin',
+        'webpack',
+        'webpack-bundle-analyzer',
+        'webpack-cli',
+        'webpack-dev-server',
+      ],
+      true
+    );
+
+    const packageDir = path.join(runDir, packageRootDir, packageName);
+    const packageJsonConfig = merge(JSON.parse(fs.readFileSync(path.join(packageDir, 'package.json'), 'utf-8')), {
+      scripts: {
+        start: 'dotenv -e ../../infrastructure/env/.env.dev -- webpack serve --mode development',
+        build: 'webpack --mode production --stats-children',
+        'build:local': 'dotenv -e ../../infrastructure/env/.env.prod -- webpack --mode production --stats-children',
+      },
+    });
+    fs.writeFileSync(path.join(packageDir, 'package.json'), JSON.stringify(packageJsonConfig, null, 2));
+
+    fs.writeFileSync(
+      path.join(packageDir, '.babelrc'),
+      JSON.stringify(
+        {
+          presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
+        },
+        null,
+        2
+      )
+    );
+
+    fs.writeFileSync(
+      path.join(packageDir, 'postcss.config.js'),
+      `module.exports = {
+  plugins: [
+    require('autoprefixer'),
+    require('postcss-preset-env')
+  ]
+};`
+    );
+
+    const { plugins, settings, ...config } = eslintReactConfig;
+    const eslintConfig = merge(JSON.parse(fs.readFileSync(path.join(packageDir, '.eslintrc'), 'utf-8')), config);
+    eslintConfig['plugins'] = addItemsUnique(eslintConfig['plugins'], plugins);
+    eslintConfig['settings']['import/extensions'] = addItemsUnique(
+      eslintConfig['settings']['import/extensions'],
+      settings['import/extensions']
+    );
+    eslintConfig['settings']['import/extensions'] = addItemsUnique(
+      eslintConfig['settings']['import/extensions'],
+      settings['import/extensions']
+    );
+    eslintConfig['settings']['import/resolver'].node.extensions = addItemsUnique(
+      eslintConfig['settings']['import/resolver'].node.extensions,
+      settings['import/resolver'].node.extensions
+    );
+    eslintConfig['settings']['import/parsers'] = addItemsUnique(
+      eslintConfig['settings']['import/parsers'],
+      settings['import/parsers']
+    );
+    fs.writeFileSync(path.join(packageDir, '.eslintrc'), JSON.stringify(eslintConfig, null, 2));
+
+    const { lib, ...tsDeltaConfig } = {
+      jsx: 'react',
+      lib: ['es2015', 'es2017', 'dom'],
+      paths: {
+        '@api': ['src/api'],
+        '@api/*': ['src/api/*'],
+      },
+    };
+    const tsConfig = merge(JSON.parse(fs.readFileSync(path.join(packageDir, 'tsconfig.json'), 'utf-8')), {
+      compilerOptions: tsDeltaConfig,
+    });
+    tsConfig.compilerOptions['lib'] = addItemsUnique(tsConfig.compilerOptions['lib'], lib);
+    fs.writeFileSync(path.join(packageDir, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2));
+
+    const publicPath = path.join(packageDir, 'public');
+    if (!fs.existsSync(publicPath)) {
+      fs.mkdirSync(publicPath);
+    }
+    fs.writeFileSync(
+      path.join(publicPath, 'index.html'),
+      `<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='utf-8' />
+</head>
+<body>
+<noscript>You need to enable JavaScript to run this app.</noscript>
+<div id="root">
+</div>
+</body>
+</html>`
+    );
+
+    fs.writeFileSync(
+      path.join(publicPath, 'robots.txt'),
+      `# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Disallow: /
+`
+    );
+
+    fs.writeFileSync(
+      path.join(packageDir, 'src', 'index.tsx'),
+      `import 'core-js/stable';
+import 'regenerator-runtime/runtime';
+import * as React from 'react';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { App } from './app';
+
+const container = document.getElementById('root');
+const root = createRoot(container!);
+
+root.render(
+    <StrictMode>
+        <App/>
+    </StrictMode>
+);`
+    );
+    fs.writeFileSync(
+      path.join(packageDir, 'src', 'app.tsx'),
+      `import React from 'react';
+
+export const App = () => {
+  return (
+    <div>
+    App
+    </div>
+  );
+};
+`
+    );
+
+    fs.writeFileSync(
+      path.join(packageDir, 'webpack.config.js'),
+      `const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+const TerserPlugin = require('terser-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const webpack = require('webpack');
+require('dotenv').config();
+
+module.exports = function (env, argv) {
+    const isEnvProduction = argv.mode === 'production';
+    const isEnvDevelopment = argv.mode === 'development';
+
+    return {
+        entry: {
+            main: './src/index.tsx'
+        },
+        target: 'web',
+        resolve: {
+            extensions: ['.ts', '.tsx', '.js'],
+            alias: {
+                '@app': path.resolve(__dirname, 'src/'),
+                '@api': path.resolve(__dirname, 'src/api/')
+            }
+        },
+        output: {
+            path: path.join(__dirname, './dist'),
+            publicPath: \`/\`,
+            scriptType: 'text/javascript',
+            assetModuleFilename: 'images/[hash][ext][query]'
+        },
+        devServer: {
+            static: './dist',
+            port: 8080,
+            historyApiFallback: true,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+                "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
+            },
+            hot: false,
+            client: {
+                logging: 'log',
+                overlay: {
+                    warnings: true,
+                    errors: true
+                }
+            },
+        },
+        module: {
+            rules: [
+                {
+                    test: /\\.ts(x?)$/,
+                    exclude: /node_modules/,
+                    use: [
+                        {
+                            loader: 'babel-loader'
+                        }
+                    ]
+                },
+                {
+                    test: /\\.(png|jpe?g|gif|svg)$/i,
+                    generator: {
+                        publicPath: \`./\`
+                    },
+                    type: 'asset/resource'
+                }
+            ]
+        },
+        plugins: [
+            new webpack.DefinePlugin({'process.env': JSON.stringify(process.env)}),
+            new CleanWebpackPlugin(),
+            new HtmlWebpackPlugin({
+                filename: 'index.html',
+                inject: true,
+                hash: true,
+                xhtml: true,
+                meta: {
+                    viewport: 'width=device-width,initial-scale=1,shrink-to-fit=no'
+                },
+                // favicon: './public/favicon.ico',
+                title: '${packageName}',
+                collapseWhitespace: false,
+                template: './public/index.html',
+                publicPath: \`./\`,
+                ...(isEnvProduction
+                    ? {
+                        minify: {
+                            removeComments: true,
+                            collapseWhitespace: true,
+                            removeRedundantAttributes: true,
+                            useShortDoctype: true,
+                            removeEmptyAttributes: true,
+                            removeStyleLinkTypeAttributes: true,
+                            keepClosingSlash: true,
+                            minifyJS: true,
+                            minifyCSS: true,
+                            minifyURLs: true
+                        }
+                    }
+                    : undefined)
+            }),
+            ...(isEnvDevelopment
+                ? [new BundleAnalyzerPlugin({analyzerPort: 8889, openAnalyzer: false})]
+                : [])
+        ],
+        devtool: isEnvDevelopment ? 'source-map' : false,
+        cache: isEnvDevelopment,
+        optimization: {
+            minimize: isEnvProduction,
+            minimizer: [
+                new TerserPlugin({
+                    terserOptions: {output: {ascii_only: true}}
+                })
+            ]
+        }
+    };
+};`
+    );
   });
 program
   .command('add-ts')
@@ -497,12 +926,22 @@ program
     );
     const { extends: ext, plugins, settings, ...conf } = eslintTsConfig;
     const eslintConfig = merge(JSON.parse(fs.readFileSync(path.join(packageDir, '.eslintrc'), 'utf-8')), conf);
-    eslintConfig['extends'].push(...ext);
-    eslintConfig['plugins'].push(...plugins);
-    eslintConfig['settings']['import/extensions'].push(...settings['import/extensions']);
-    eslintConfig['settings']['import/resolver'].node.extensions.push(...settings['import/resolver'].node.extensions);
-    eslintConfig['settings']['import/parsers'] = settings['import/parsers'];
-      fs.writeFileSync(path.join(packageDir, '.eslintrc'), JSON.stringify(eslintConfig, null, 2));
+
+    eslintConfig['extends'] = addItemsUnique(eslintConfig['extends'], ext);
+    eslintConfig['plugins'] = addItemsUnique(eslintConfig['plugins'], plugins);
+    eslintConfig['settings']['import/extensions'] = addItemsUnique(
+      eslintConfig['settings']['import/extensions'],
+      settings['import/extensions']
+    );
+    eslintConfig['settings']['import/resolver'].node.extensions = addItemsUnique(
+      eslintConfig['settings']['import/resolver'].node.extensions,
+      settings['import/resolver'].node.extensions
+    );
+    eslintConfig['settings']['import/parsers'] = addItemsUnique(
+      eslintConfig['settings']['import/parsers'] || [],
+      settings['import/parsers']
+    );
+    fs.writeFileSync(path.join(packageDir, '.eslintrc'), JSON.stringify(eslintConfig, null, 2));
 
     console.log(chalk.green('Done'));
   });

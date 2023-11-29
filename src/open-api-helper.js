@@ -2,12 +2,15 @@
 
 const fs = require('fs');
 const path = require('path');
-const { Command } = require('commander');
+const { Command, Argument } = require('commander');
 const { execute } = require('./execute-helper');
 const chalk = require('chalk');
+const { merge } = require('lodash');
 
 const program = new Command();
 const runDir = process.cwd();
+const projectConfig = JSON.parse(fs.readFileSync(path.join(runDir, 'proj.json')).toString());
+const packagesDirs = projectConfig.packageDirs.reduce((acc, item) => ({ ...acc, [item]: path.join(runDir, item) }), {});
 const frontGenTemplate = 'typescript-fetch-templates';
 const backGenTemplate = 'typescript-nestjs-templates';
 
@@ -88,25 +91,39 @@ program.name('open-api').description('Cli to help work with open api generator')
 program
   .command('init')
   .description('Create needed files, install packages and add commands')
+  .addArgument(new Argument('<root-dir>', 'Directory to create package in').choices(Object.keys(packagesDirs)))
+  .argument('<package-name>', 'Package name')
   .option('-f, --front', 'Generate frontend api', true)
   .option('-b, --back', 'Generate backend api', false)
   .option('-d, --dest <destPath>', 'Generation output directory', 'src/api')
   .option('-s, --spec <specPath>', 'Path to specification', '')
   .option('--front-generator <frontGeneratorName>', 'Frontend api generator name', 'typescript-fetch')
   .option('--back-generator <backGeneratorName>', 'Backend api generator name', 'typescript-nestjs')
-  .action(async (options) => {
-    const templatesDir = path.join(runDir, 'templates');
-    const packageDir = path.resolve(path.join(__dirname));
-    const packageJsonPath = path.join(runDir, 'package.json');
+  .action(async (packageRootDir, packageName, options) => {
+    const itoolsDir = path.resolve(path.join(__dirname));
+    const packageDir = path.resolve(runDir, packageRootDir, packageName);
+    const templatesDir = path.join(packageDir, 'templates');
+    const packageJsonPath = path.join(packageDir, 'package.json');
     if (options.front) {
-      initFront(templatesDir, packageDir, options);
+      initFront(templatesDir, itoolsDir, options);
     }
     if (options.back) {
-      initBack(templatesDir, packageDir, options);
+      initBack(templatesDir, itoolsDir, options);
     }
-    await execute('yarn', ['add', '-D', '@openapitools/openapi-generator-cli', 'cross-env', 'prettier'], true);
+    await execute(
+      `yarn`,
+      [
+        'workspace',
+        `@${projectConfig.projectName}/${packageName}`,
+        'add',
+        '-D',
+        '@openapitools/openapi-generator-cli',
+        'cross-env',
+        'prettier',
+      ],
+      true
+    );
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
-    console.log('packageJson', packageJson);
     if (!packageJson.scripts) {
       packageJson.scripts = {};
     }
@@ -114,6 +131,16 @@ program
     packageJson.scripts['api-generate'] =
       'cross-env TS_POST_PROCESS_FILE="node ./node_modules/prettier/bin/prettier.cjs --write" JAVA_OPTS="-Dlog.level=info" openapi-generator-cli generate';
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+
+    const tsConfig = merge(JSON.parse(fs.readFileSync(path.join(packageDir, 'tsconfig.json'), 'utf-8')), {
+      compilerOptions: {
+        paths: {
+          '@api': ['src/api'],
+          '@api/*': ['src/api/*'],
+        },
+      },
+    });
+    fs.writeFileSync(path.join(packageDir, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2));
     console.log(chalk.green('Done'));
   });
 
