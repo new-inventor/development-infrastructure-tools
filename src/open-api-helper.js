@@ -36,7 +36,7 @@ const defaultConfig = {
   },
 };
 
-const generateOpenAPIToolsConfig = (generatorKey, generatorName, spec, generationPath, template) => {
+const generateOpenAPIToolsConfig = (generatorKey, generatorName, spec, generationPath, template, configPath) => {
   const res = defaultConfig;
   res['generator-cli']['generators'][generatorKey] = defaultGenerator;
   res['generator-cli']['generators'][generatorKey].generatorName = generatorName;
@@ -47,15 +47,15 @@ const generateOpenAPIToolsConfig = (generatorKey, generatorName, spec, generatio
   if (generationPath) {
     res['generator-cli']['generators'][generatorKey].output = generationPath;
   }
-  fs.writeFileSync(path.join(runDir, 'openapitools.json'), JSON.stringify(res, null, 2));
+  fs.writeFileSync(path.join(configPath, 'openapitools.json'), JSON.stringify(res, null, 2));
 };
 
-const initFront = (templatesDir, packageDir, options) => {
+const initFront = (templatesDir, itoolsDir, packageDir, options) => {
   if (options.frontGenerator === 'typescript-fetch') {
     if (!fs.existsSync(templatesDir)) {
       fs.mkdirSync(templatesDir);
     }
-    fs.cpSync(path.join(packageDir, frontGenTemplate), path.join(templatesDir, frontGenTemplate), {
+    fs.cpSync(path.join(itoolsDir, frontGenTemplate), path.join(templatesDir, frontGenTemplate), {
       recursive: true,
       force: true,
     });
@@ -65,15 +65,16 @@ const initFront = (templatesDir, packageDir, options) => {
     options.frontGenerator,
     options.spec,
     options.dest,
-    options.frontGenerator === 'typescript-fetch' ? frontGenTemplate : undefined
+    options.frontGenerator === 'typescript-fetch' ? frontGenTemplate : undefined,
+    packageDir
   );
 };
-const initBack = (templatesDir, packageDir, options) => {
+const initBack = (templatesDir, itoolsDir, packageDir, options) => {
   if (options.backGenerator === 'typescript-nestjs') {
     if (!fs.existsSync(templatesDir)) {
       fs.mkdirSync(templatesDir);
     }
-    fs.cpSync(path.join(packageDir, backGenTemplate), path.join(templatesDir, backGenTemplate), {
+    fs.cpSync(path.join(itoolsDir, backGenTemplate), path.join(templatesDir, backGenTemplate), {
       recursive: true,
       force: true,
     });
@@ -83,7 +84,8 @@ const initBack = (templatesDir, packageDir, options) => {
     options.frontGenerator,
     options.spec,
     options.dest,
-    options.frontGenerator === 'typescript-nestjs' ? backGenTemplate : undefined
+    options.frontGenerator === 'typescript-nestjs' ? backGenTemplate : undefined,
+    packageDir
   );
 };
 
@@ -105,10 +107,10 @@ program
     const templatesDir = path.join(packageDir, 'templates');
     const packageJsonPath = path.join(packageDir, 'package.json');
     if (options.front) {
-      initFront(templatesDir, itoolsDir, options);
+      initFront(templatesDir, itoolsDir, packageDir, options);
     }
     if (options.back) {
-      initBack(templatesDir, itoolsDir, options);
+      initBack(templatesDir, itoolsDir, packageDir, options);
     }
     await execute(
       `yarn`,
