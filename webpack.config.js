@@ -13,6 +13,7 @@ module.exports = function (env, argv) {
             create_app: './src/create-app.ts',
             docker: './src/docker-decorator.js',
             package: './src/package-helper.js',
+            open_api: './src/open-api-helper.js',
         },
         target: 'node',
         resolve: {

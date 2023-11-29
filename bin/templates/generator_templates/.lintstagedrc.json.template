@@ -1,3 +1,0 @@
-{
-  "src/**/*.{tsx,ts,js,json,yaml,yml}": ["eslint --fix", "prettier -w -u"]
-}

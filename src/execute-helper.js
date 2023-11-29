@@ -1,16 +1,15 @@
-const {execSync} = require("node:child_process");
+const { execSync } = require('node:child_process');
 const spawn = require('cross-spawn');
 const chalk = require('chalk');
-
 
 const execute = (command, params, printCommand = false) => {
   console.log('run: ', `${command} ${params ? params.join(' ') : ''}`);
   return new Promise((resolve, reject) => {
     const runner = spawn(command, params);
-    runner.stdout.on('data', output => {
+    runner.stdout.on('data', (output) => {
       // the output data is captured and printed in the callback
       if (printCommand) {
-        process.stdout.write(`Output: ${output.toString()}`)
+        process.stdout.write(`Output: ${output.toString()}`);
       }
     });
     runner.on('close', (code) => {
@@ -20,9 +19,9 @@ const execute = (command, params, printCommand = false) => {
     runner.on('error', (error) => {
       console.error(chalk.red(error));
       reject(error);
-    })
+    });
   });
-}
+};
 
 const getCommandRes = (command, printCommand = false) => {
   try {
@@ -34,9 +33,9 @@ const getCommandRes = (command, printCommand = false) => {
   } catch (e) {
     console.error('Error', e.output.toString());
   }
-}
+};
 
 module.exports = {
   execute,
   getCommandRes,
-}
+};

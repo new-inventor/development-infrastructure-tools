@@ -1913,6 +1913,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash@npm:^4":
+  version: 4.14.202
+  resolution: "@types/lodash@npm:4.14.202"
+  checksum: a91acf3564a568c6f199912f3eb2c76c99c5a0d7e219394294213b3f2d54f672619f0fde4da22b29dc5d4c31457cd799acc2e5cb6bd90f9af04a1578483b6ff7
+  languageName: node
+  linkType: hard
+
 "@types/minimatch@npm:*":
   version: 5.1.2
   resolution: "@types/minimatch@npm:5.1.2"
@@ -3912,6 +3919,7 @@ __metadata:
     "@types/dot-object": ^2
     "@types/gulp": ^4
     "@types/inquirer": ^9
+    "@types/lodash": ^4
     "@types/node": ^18.15.11
     "@types/prettier": ^3
     "@typescript-eslint/eslint-plugin": ^5.59.0
@@ -3937,6 +3945,7 @@ __metadata:
     gulp-typescript: ^6.0.0-alpha.1
     inquirer: ^9.2.10
     java2typescript: ^1.0.2
+    lodash: ^4.17.21
     prettier: ^3.0.3
     terser-webpack-plugin: ^5.3.7
     ts-node: ^10.9.1
@@ -3948,6 +3957,7 @@ __metadata:
   bin:
     itools-create-app: bin/create_app.js
     itools-docker: bin/docker.js
+    itools-open-api: bin/open_api.js
     itools-package: bin/package.js
   languageName: unknown
   linkType: soft

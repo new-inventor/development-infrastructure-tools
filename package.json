@@ -12,6 +12,7 @@
     "glob": "9.3.4",
     "inquirer": "^9.2.10",
     "java2typescript": "^1.0.2",
+    "lodash": "^4.17.21",
     "yaml": "^2.3.1"
   },
   "files": [
@@ -20,16 +21,16 @@
   "bin": {
     "itools-create-app": "bin/create_app.js",
     "itools-docker": "bin/docker.js",
+    "itools-open-api": "bin/open_api.js",
     "itools-package": "bin/package.js"
   },
   "scripts": {
-    "itools-create-app": "node bin/create-app.js",
-    "itools-docker": "node bin/docker-decorator.js",
-    "itools-package": "node bin/package-helper.js",
-    "itools-api": "node bin/generate-api.js",
-    "clean": "gulp clean",
+    "itools-create-app": "node bin/create_app.js",
+    "itools-docker": "node bin/docker.js",
+    "itools-package": "node bin/package.js",
+    "itools-api": "node bin/open_api.js",
     "build": "webpack --mode production",
-    "build-test-api": "tsc -p ./src/target_ts/tsconfig.json",
+    "build-test-api": "tsc -p ./target_ts/tsconfig.json",
     "format": "prettier --write --ignore-unknown ./src",
     "api-generate-dev": "cross-env JAVA_OPTS=\"-Dlog.level=info\" openapi-generator-cli generate",
     "api-generate": "cross-env TS_POST_PROCESS_FILE=\"node ./node_modules/prettier/bin/prettier.cjs --write\" JAVA_OPTS=\"-Dlog.level=info\" openapi-generator-cli generate",
@@ -44,6 +45,7 @@
     "@types/dot-object": "^2",
     "@types/gulp": "^4",
     "@types/inquirer": "^9",
+    "@types/lodash": "^4",
     "@types/node": "^18.15.11",
     "@types/prettier": "^3",
     "@typescript-eslint/eslint-plugin": "^5.59.0",
